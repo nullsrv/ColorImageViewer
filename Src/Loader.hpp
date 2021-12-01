@@ -19,25 +19,28 @@
 
 #pragma once
 
+#include "Image.hpp"
+
 #include <QDir>
 #include <QString>
 #include <QGraphicsScene>
-#include <QColor>
+#include <QList>
 
 namespace ColorImageViewer {
 
 class Loader
 {
-    QDir mDirectory;
+    QDir            mDirectory;
+    QGraphicsScene* mScenePtr;
+    QList<Image*>   mImageList;
 
     auto CalculateAvarageColor (const QImage* image) -> QColor;
-    auto CreateImage (QColor color) -> QImage*;
 
 public:
     Loader  ();
     ~Loader ();
 
-    auto LoadDirectory (QString directory, QGraphicsScene* scene) -> bool;
+    auto load (QString directory, QGraphicsScene* scene) -> bool;
 };
 
 } // namespace ColorImageViewer

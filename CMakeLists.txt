@@ -31,6 +31,8 @@ set(PROJECT_SOURCES
         Src/ImageItem.cpp
         Src/Loader.hpp
         Src/Loader.cpp
+        Src/Image.hpp
+        Src/Image.cpp
 )
 
 qt_add_executable(${CMAKE_PROJECT_NAME}

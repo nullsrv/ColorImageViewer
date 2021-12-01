@@ -21,7 +21,6 @@
 #include "./ui_MainWindow.h"
 
 #include "Loader.hpp"
-#include "ImageItem.hpp"
 
 namespace ColorImageViewer {
 
@@ -33,20 +32,20 @@ MainWindow::MainWindow(QWidget *parent)
 {
     mUI->setupUi(this);
 
-    LoadDirectory("t:/demo");
+    auto loader = Loader();
+    loader.load("t:/demo", mScene);
     mImageGrid->SetScene(mScene);
-
 
     setCentralWidget(mImageGrid);
     setFocusPolicy(Qt::StrongFocus);
     setWindowTitle("Color Image Viewer");
 }
 
-auto MainWindow::LoadDirectory (QString path) -> bool
+MainWindow::~MainWindow ()
 {
-    auto loader = Loader();
-
-    return loader.LoadDirectory(path, mScene);
+    delete mScene;
+    delete mImageGrid;
+    delete mUI;
 }
 
 } //namespace ColorImageViewer

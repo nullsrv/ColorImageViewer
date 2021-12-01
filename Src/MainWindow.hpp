@@ -20,26 +20,11 @@
 #pragma once
 
 #include "ImageGrid.hpp"
-
 #include <QMainWindow>
-#include <QPainter>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QDebug>
-#include <QDir>
-#include <QString>
-#include <QPalette>
-
-#include <iostream>
-#include <filesystem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
-namespace {
-    namespace fs = std::filesystem;
-}
 
 namespace ColorImageViewer {
 
@@ -51,10 +36,9 @@ class MainWindow : public QMainWindow
     ImageGrid*      mImageGrid;
     QGraphicsScene* mScene;
 
-    auto LoadDirectory (QString path) -> bool;
-
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow  (QWidget *parent = nullptr);
+    ~MainWindow ();
 };
 
 } // namespace ColorImageViewer

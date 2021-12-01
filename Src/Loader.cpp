@@ -18,7 +18,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "Loader.hpp"
-
 #include "ImageItem.hpp"
 
 #include <QDirIterator>
@@ -26,8 +25,8 @@
 namespace ColorImageViewer {
 
 Loader::Loader ()
+    : mScenePtr (nullptr)
 {
-
 }
 
 Loader::~Loader ()
@@ -53,11 +52,12 @@ auto Loader::CalculateAvarageColor (const QImage* image) -> QColor
         return QColor(0, 0, 0, 0);
     }
 
-    for (auto i = quint64(0); i < size; i += step)
+    for (auto i = qsizetype(0); i < size; i += step)
     {
-        red   += pixels[i];
+        // BGRA
+        blue  += pixels[i + 0];
         green += pixels[i + 1];
-        blue  += pixels[i + 2];
+        red   += pixels[i + 2];
         alpha += pixels[i + 3];
 
         count += 1;
@@ -76,31 +76,20 @@ auto Loader::CalculateAvarageColor (const QImage* image) -> QColor
     );
 }
 
-auto Loader::CreateImage (QColor color) -> QImage*
-{
-    auto image = new QImage(64, 64, QImage::Format::Format_RGB32);
-    image->fill(color);
 
-    return image;
-}
-
-auto Loader::LoadDirectory (QString directory, QGraphicsScene* scene) -> bool
+auto Loader::load (QString directory, QGraphicsScene* scene) -> bool
 {
     mDirectory = directory;
+    mScenePtr  = scene;
 
-    auto images = std::vector<ImageItem*>();
     auto fileList = std::vector<QFileInfo>();
 
     // Get list of files.
     auto it = QDirIterator(directory, {"*.png", "*.jpg"}, QDir::Files);
     while (it.hasNext())
     {
-        if (!it.fileName().isEmpty())
-        {
-            fileList.push_back(it.fileInfo());
-        }
-
         it.next();
+        fileList.push_back(it.fileInfo());
     }
 
     // Load.
@@ -108,18 +97,11 @@ auto Loader::LoadDirectory (QString directory, QGraphicsScene* scene) -> bool
     auto total = fileList.size();
     for (const auto& f : fileList)
     {
-        auto image = new QImage(f.filePath());
+        auto image = new Image(f);
+        auto avg   = CalculateAvarageColor(image->image());
+        image->averageColor(avg);
 
-        auto scaled = image->scaled(128, 128);
-
-        auto avg = CalculateAvarageColor(&scaled);
-
-        delete image;
-        image = CreateImage(avg);
-
-        auto item = new ImageItem(image, avg);
-        scene->addItem(item);
-        images.push_back(item);
+        mImageList.push_back(image);
 
         qDebug() << "Loaded image " << f.fileName()
                  << "[" << avg.red() << avg.green() << avg.blue() << avg.alpha() << "]"
@@ -129,14 +111,20 @@ auto Loader::LoadDirectory (QString directory, QGraphicsScene* scene) -> bool
     }
 
     // Sort.
-    auto cmp = [](ImageItem* lhs, ImageItem* rhs) -> bool
+    auto cmp = [](Image* lhs, Image* rhs) -> bool
     {
         const auto lcolor = lhs->averageColor();
         const auto rcolor = rhs->averageColor();
         return lcolor.hue() < rcolor.hue();
     };
 
-    std::sort(images.begin(), images.end(), cmp);
+    std::sort(mImageList.begin(), mImageList.end(), cmp);
+
+    for (auto& image : mImageList)
+    {
+        auto item = new ImageItem(image);
+        mScenePtr->addItem(item);
+    }
 
     // Position.
     const auto imageWidth  = 64;
@@ -152,7 +140,7 @@ auto Loader::LoadDirectory (QString directory, QGraphicsScene* scene) -> bool
     auto x = xx;
     auto y = yy;
 
-    for (auto item : images)
+    for (auto& item : mScenePtr->items())
     {
         item->setPos(x, y);
         x += imageWidth + padding;

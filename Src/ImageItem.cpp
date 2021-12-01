@@ -24,37 +24,29 @@
 
 namespace ColorImageViewer {
 
-ImageItem::ImageItem (QImage* image, QColor averageColor)   
+ImageItem::ImageItem (Image* image)
+    : mImage (image)
 {
     setAcceptHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable);
+    
+    const auto w = static_cast<double>(image->width());
+    const auto h = static_cast<double>(image->height());
 
-    const auto w = (double)image->width();
-    const auto h = (double)image->height();
-    mAspectRatio = w / h;
+    const auto ratio = std::min(64 / w, 64 / h);
 
-    auto ratio = std::min(64 / w, 64 / h);
-
-    mItemWidth  = (int)(image->width() * ratio);
-    mItemHeight = (int)(image->height() * ratio);
+    mItemWidth  = static_cast<int>(image->width() * ratio);
+    mItemHeight = static_cast<int>(image->height() * ratio);
 
     const auto halfWidth  = mItemWidth / 2;
     const auto halfHeight = mItemHeight / 2;
 
     mTopLeft     = QPoint(-halfWidth, -halfHeight);
     mBottomRight = QPoint(halfWidth, halfHeight);
-
-    auto scaled = image->scaled(mItemWidth * 2, mItemHeight * 2);
-    mImage = new QImage(scaled);
-
-    delete image;
-
-    mAverageColor = averageColor;
 }
 
 ImageItem::~ImageItem()
 {
-    delete mImage;
 }
 
 auto ImageItem::boundingRect () const -> QRectF
@@ -64,6 +56,8 @@ auto ImageItem::boundingRect () const -> QRectF
 
 auto ImageItem::paint (QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) -> void
 {
+    const auto lod = option->levelOfDetailFromTransform(painter->worldTransform());
+
     auto overlay = false;
     auto color   = QColor();
     
@@ -82,21 +76,35 @@ auto ImageItem::paint (QPainter* painter, const QStyleOptionGraphicsItem* option
         }
     }
 
-    painter->drawImage(QRectF(mTopLeft, mBottomRight), *mImage);
+    if (lod < 1.0)
+    {
+        painter->fillRect(QRectF(mTopLeft, mBottomRight), mImage->averageColor());
+    }
+    else
+    {
+        if (const auto img = mImage->image())
+        {
+            painter->drawImage(QRectF(mTopLeft, mBottomRight), *img);
+        }
+    }
 
     if (overlay)
     {
         const auto maskColor = QColor(255, 255, 255, 32);
         const auto x0 = mTopLeft.x();
         const auto y0 = mTopLeft.y();
-        const auto x1 = x0 + mItemWidth;
-        const auto y1 = y0 + mItemHeight;
+        const auto x1 = mBottomRight.x();
+        const auto y1 = mBottomRight.y();
+
+        const auto points = QList<QPoint>({
+            QPoint(x0, y0),
+            QPoint(x1, y0),
+            QPoint(x1, y1),
+            QPoint(x0, y1),
+        });
 
         painter->setPen(QPen(color, 1));
-        painter->drawLine(x0, y0, x1, y0);
-        painter->drawLine(x1, y0, x1, y1);
-        painter->drawLine(x1, y1, x0, y1);
-        painter->drawLine(x0, y1, x0, y0);
+        painter->drawPolygon(points.data(), points.size());
 
         painter->fillRect(x0, y0, mItemWidth, mItemHeight, maskColor);
     }

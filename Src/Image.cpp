@@ -17,37 +17,40 @@
 // 
 // SPDX-License-Identifier: GPL-3.0-only
 
-#pragma once
-
 #include "Image.hpp"
-
-#include <QGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QStyleOptionGraphicsItem>
 
 namespace ColorImageViewer {
 
-class ImageItem : public QGraphicsItem
+Image::Image (QFileInfo file)
 {
-    Image*  mImage;
-    int     mItemWidth;
-    int     mItemHeight;
-    QPoint  mTopLeft;
-    QPoint  mBottomRight;
+    auto image = new QImage(file.filePath());
+    auto scaled = new QImage(image->scaled(128, 128, Qt::AspectRatioMode::KeepAspectRatio));
 
-public:
-    ImageItem  (Image* image);
-    ~ImageItem ();
+    mImage = scaled;
+    if (mImage)
+    {
+        mWidth        = image->width();  // save original width
+        mHeight       = image->height(); // save original height
+        mSize         = file.size();
+        mLastModified = file.lastModified();
+        mThumbnail    = new QImage(mImage->scaled(32, 32, Qt::AspectRatioMode::KeepAspectRatio));
+        mIsLoaded     = true;
+    }
 
-    auto boundingRect () const -> QRectF override;
-    auto paint (QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) -> void override;
+    delete image;
+}
+    
+Image::~Image ()
+{
+    if (mThumbnail)
+    {
+        delete mThumbnail;
+    }
 
-protected:
-    auto mousePressEvent       (QGraphicsSceneMouseEvent* e) -> void override;
-    auto mouseMoveEvent        (QGraphicsSceneMouseEvent* e) -> void override;
-    auto mouseReleaseEvent     (QGraphicsSceneMouseEvent* e) -> void override;
-    auto mouseDoubleClickEvent (QGraphicsSceneMouseEvent* e) -> void override;
-};
+    if (mImage)
+    {
+        delete mImage;
+    }
+}
 
 } // namespace ColorImageViewer
