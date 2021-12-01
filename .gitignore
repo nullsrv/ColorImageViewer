@@ -1,0 +1,12 @@
+
+# Output directories
+/Build
+/Out
+
+# Intermediate directories
+/Obj
+
+# Visual Studio
+*.vcxproj.user
+*.aps
+.vs/
