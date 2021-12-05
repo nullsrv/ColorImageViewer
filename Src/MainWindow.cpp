@@ -29,11 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
     , mUI         (new Ui::MainWindow())
     , mImageGrid  (new ImageGrid())
     , mScene      (new QGraphicsScene())
+    , mLoader     ()
 {
     mUI->setupUi(this);
 
-    auto loader = Loader();
-    loader.load("t:/demo", mScene);
+    connect(&mLoader, &Loader::imageLoaded, this, &MainWindow::imageLoaded);
+
+    mLoader.load("t:/demo");
     mImageGrid->SetScene(mScene);
 
     setCentralWidget(mImageGrid);

@@ -80,6 +80,13 @@ auto ImageItem::paint (QPainter* painter, const QStyleOptionGraphicsItem* option
     {
         painter->fillRect(QRectF(mTopLeft, mBottomRight), mImage->averageColor());
     }
+    else if (lod < 2.0)
+    {
+        if (const auto img = mImage->thumbnail())
+        {
+            painter->drawImage(QRectF(mTopLeft, mBottomRight), *img);
+        }
+    }
     else
     {
         if (const auto img = mImage->image())

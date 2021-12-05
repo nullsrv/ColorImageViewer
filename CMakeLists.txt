@@ -30,9 +30,11 @@ set(PROJECT_SOURCES
         Src/ImageItem.hpp
         Src/ImageItem.cpp
         Src/Loader.hpp
-        Src/Loader.cpp
+        Src/LoaderWorker.hpp
+        Src/LoaderTask.hpp
         Src/Image.hpp
         Src/Image.cpp
+        Src/AverageColor.hpp
 )
 
 qt_add_executable(${CMAKE_PROJECT_NAME}

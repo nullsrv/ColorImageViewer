@@ -17,40 +17,50 @@
 // 
 // SPDX-License-Identifier: GPL-3.0-only
 
+#pragma once
+
+#include "AverageColor.hpp"
 #include "Image.hpp"
+
+#include <QFileInfo>
+#include <QRunnable>
+#include <QThread>
 
 namespace ColorImageViewer {
 
-Image::Image (QFileInfo file)
+class LoaderTask : public QObject, public QRunnable
 {
-    auto image = new QImage(file.filePath());
-    auto scaled = new QImage(image->scaled(256, 256, Qt::AspectRatioMode::KeepAspectRatio));
+    Q_OBJECT
 
-    mImage = scaled;
-    if (mImage)
+private:
+    int       mId;
+    QFileInfo mPath;
+
+public:
+    LoaderTask (const int id, const QFileInfo& path)
+        : mId   (id)
+        , mPath (path)
     {
-        mWidth        = image->width();  // save original width
-        mHeight       = image->height(); // save original height
-        mSize         = file.size();
-        mLastModified = file.lastModified();
-        mThumbnail    = new QImage(mImage->scaled(64, 64, Qt::AspectRatioMode::KeepAspectRatio));
-        mIsLoaded     = true;
     }
 
-    delete image;
-}
-    
-Image::~Image ()
-{
-    if (mThumbnail)
+    auto run () -> void
     {
-        //delete mThumbnail;
+        qDebug() << "LoaderTask::run()" << QThread::currentThreadId();
+        load(mPath);
     }
 
-    if (mImage)
+private:
+    auto load (const QFileInfo& path) -> void
     {
-        //delete mImage;
+        auto image = new Image(path);
+        auto avg   = CalculateAverageColor(image->image());
+        image->averageColor(avg);
+
+        emit loaded(mId, image);
     }
-}
+
+signals:
+    auto loaded (int taskId, Image* image) -> void;
+};
 
 } // namespace ColorImageViewer

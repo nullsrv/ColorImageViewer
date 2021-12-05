@@ -20,27 +20,53 @@
 #pragma once
 
 #include "Image.hpp"
+#include "LoaderWorker.hpp"
 
 #include <QDir>
 #include <QString>
-#include <QGraphicsScene>
-#include <QList>
 
 namespace ColorImageViewer {
 
-class Loader
+class Loader : public QObject
 {
-    QDir            mDirectory;
-    QGraphicsScene* mScenePtr;
-    QList<Image*>   mImageList;
+    Q_OBJECT
 
-    auto CalculateAvarageColor (const QImage* image) -> QColor;
+private:
+    QThread mWorkerThread;
 
 public:
-    Loader  ();
-    ~Loader ();
+    Loader ()
+    {
+        auto worker = new LoaderWorker();
+        connect(&mWorkerThread, &QThread::finished, worker, &QObject::deleteLater);
+        connect(this, &Loader::startLoading, worker, &LoaderWorker::load);
+        connect(worker, &LoaderWorker::imageLoaded, this, &Loader::handleImageLoaded);
 
-    auto load (QString directory, QGraphicsScene* scene) -> bool;
+        worker->moveToThread(&mWorkerThread);
+        mWorkerThread.start();
+    }
+
+    ~Loader ()
+    {
+        mWorkerThread.quit();
+        mWorkerThread.wait();
+    }
+
+    auto load (const QString& directory) -> void
+    {
+        startLoading(directory);
+    }
+
+private slots:
+    void handleImageLoaded (Image* image)
+    {
+        qDebug() << "handleResults()" << QThread::currentThreadId();
+        emit imageLoaded(image);
+    }
+
+signals:
+    auto startLoading (const QString &) -> void;
+    auto imageLoaded  (Image* image)    -> void;
 };
 
 } // namespace ColorImageViewer
