@@ -27,7 +27,6 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QString>
-#include <QThread>
 #include <QThreadPool>
 
 namespace ColorImageViewer {
@@ -57,8 +56,6 @@ public:
 public slots:
     auto load (const QString& directory) -> void
     {
-        qDebug() << "LoaderWorker::load()" << QThread::currentThreadId();
-
         // Get list of files.
         auto total = 0;
         auto it    = QDirIterator(directory, {"*.png", "*.jpg"}, QDir::Files);

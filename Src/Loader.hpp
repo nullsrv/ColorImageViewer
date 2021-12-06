@@ -22,6 +22,8 @@
 #include "Image.hpp"
 #include "LoaderWorker.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <QDir>
 #include <QString>
 
@@ -54,13 +56,13 @@ public:
 
     auto load (const QString& directory) -> void
     {
+        spdlog::info("Loading directory '{}'", directory.toStdString());
         startLoading(directory);
     }
 
 private slots:
     void handleImageLoaded (Image* image)
     {
-        qDebug() << "handleResults()" << QThread::currentThreadId();
         emit imageLoaded(image);
     }
 

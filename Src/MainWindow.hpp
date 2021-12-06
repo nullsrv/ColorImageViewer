@@ -22,6 +22,7 @@
 #include "ImageGrid.hpp"
 #include "ImageItem.hpp"
 #include "Loader.hpp"
+
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -34,11 +35,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
     Ui::MainWindow* mUI;
     ImageGrid*      mImageGrid;
     QGraphicsScene* mScene;
     Loader          mLoader;
-    QList<Image*>    mImages;
+    QList<Image*>   mImages;
 
 public:
     MainWindow  (QWidget *parent = nullptr);
@@ -47,8 +49,6 @@ public:
 public slots:
     auto imageLoaded (Image* image) -> void
     {
-        qDebug() << "Loaded image" << QThread::currentThreadId();
-
         // Position.
         const auto imageWidth  = 64;
         const auto imageHeight = 64;

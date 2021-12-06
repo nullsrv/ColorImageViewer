@@ -18,17 +18,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "MainWindow.hpp"
+#include "Logger.hpp"
 
 #include <QApplication>
 
-namespace {
-    using namespace ColorImageViewer;
-}
-
-int main(int argc, char *argv[])
+auto main (int argc, char *argv[]) -> int
 {
+    ColorImageViewer::init_logger();
+
     QApplication a(argc, argv);
-    MainWindow w;
+
+    ColorImageViewer::MainWindow w;
     w.show();
+
     return a.exec();
 }

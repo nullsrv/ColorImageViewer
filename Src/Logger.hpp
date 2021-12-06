@@ -19,52 +19,30 @@
 
 #pragma once
 
-#include "AverageColor.hpp"
-#include "Image.hpp"
-
 #include <spdlog/spdlog.h>
-
-#include <QFileInfo>
-#include <QRunnable>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
 
 namespace ColorImageViewer {
 
-class LoaderTask : public QObject, public QRunnable
+inline auto init_logger () -> void
 {
-    Q_OBJECT
+    auto logger = spdlog::basic_logger_mt("file_logger", "ColorImageViewer.log", true);
+    logger->set_pattern("[%Y-%m-%d %T.%e][%8l]{%5t} %v");
 
-private:
-    int       mId;
-    QFileInfo mPath;
+    spdlog::flush_on(spdlog::level::info);
+    spdlog::set_level(spdlog::level::level_enum::info);
 
-public:
-    LoaderTask (const int id, const QFileInfo& path)
-        : mId   (id)
-        , mPath (path)
-    {
-    }
+#if defined(_DEBUG) && defined(_WIN32)
+    auto vsdbgsink = std::make_shared<spdlog::sinks::windebug_sink_mt>();
+    vsdbgsink->set_pattern("[%8l]{%5t} %v");
+    logger->sinks().push_back(vsdbgsink);
 
-    auto run () -> void
-    {        
-        load(mPath);
-    }
+    spdlog::flush_on(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::level_enum::debug);
+#endif
 
-private:
-    auto load (const QFileInfo& path) -> void
-    {
-        spdlog::info("<LoaderTask:{}> loading image '{}'...", mId, mPath.fileName().toStdString());
-
-        auto image = new Image(path);
-        auto avg   = CalculateAverageColor(image->image());
-        image->averageColor(avg);
-
-        emit loaded(mId, image);
-
-        spdlog::info("<LoaderTask:{}> image loaded", mId);
-    }
-
-signals:
-    auto loaded (int taskId, Image* image) -> void;
-};
+    spdlog::set_default_logger(logger);
+}
 
 } // namespace ColorImageViewer

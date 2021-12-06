@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ColorImageViewer VERSION 0.1 LANGUAGES CXX)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 message("Looking for Qt6...")
 find_package(QT NAMES Qt6 COMPONENTS Widgets REQUIRED)
@@ -35,6 +35,7 @@ set(PROJECT_SOURCES
         Src/Image.hpp
         Src/Image.cpp
         Src/AverageColor.hpp
+        Src/Logger.hpp
 )
 
 qt_add_executable(${CMAKE_PROJECT_NAME}
@@ -43,6 +44,7 @@ qt_add_executable(${CMAKE_PROJECT_NAME}
     ${PROJECT_SOURCES}
 )
 
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "Deps/spdlog/include")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 if(QT_VERSION_MAJOR EQUAL 6)
