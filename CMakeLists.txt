@@ -21,22 +21,26 @@ else()
 endif()
 
 set(PROJECT_SOURCES
-        Src/Main.cpp
-        Src/MainWindow.cpp
-        Src/MainWindow.hpp
-        Src/MainWindow.ui
-        Src/ImageGrid.hpp
-        Src/ImageGrid.cpp
-        Src/ImageItem.hpp
-        Src/ImageItem.cpp
-        Src/Loader.hpp
-        Src/LoaderWorker.hpp
-        Src/LoaderTask.hpp
-        Src/Image.hpp
-        Src/AverageColor.hpp
+        Src/Common/AverageColor.hpp
+        Src/Common/Image.hpp
+        Src/Common/Scaler.hpp
+        
+        Src/Widgets/ImageGrid.cpp
+        Src/Widgets/ImageGrid.hpp
+        Src/Widgets/ImageItem.cpp
+        Src/Widgets/ImageItem.hpp
+
+        Src/Windows/MainWindow.cpp
+        Src/Windows/MainWindow.hpp
+        Src/Windows/MainWindow.ui
+        
+        Src/Loader/Loader.hpp
+        Src/Loader/LoaderTask.hpp
+        Src/Loader/LoaderWorker.hpp
+        Src/Loader/ImageLoader.hpp
+
         Src/Logger.hpp
-        Src/ImageLoader.hpp
-        Src/Scaler.hpp
+        Src/Main.cpp
 )
 
 qt_add_executable(${CMAKE_PROJECT_NAME}
@@ -45,6 +49,7 @@ qt_add_executable(${CMAKE_PROJECT_NAME}
     ${PROJECT_SOURCES}
 )
 
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "Src")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "Deps/spdlog/include")
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 

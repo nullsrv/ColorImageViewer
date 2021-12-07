@@ -17,7 +17,7 @@
 // 
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "MainWindow.hpp"
+#include "Windows/MainWindow.hpp"
 #include "Logger.hpp"
 
 #include <QApplication>

@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "AverageColor.hpp"
-#include "Image.hpp"
-#include "Scaler.hpp"
+#include "Common/AverageColor.hpp"
+#include "Common/Image.hpp"
+#include "Common/Scaler.hpp"
 
 #include <QBuffer>
 #include <QByteArray>

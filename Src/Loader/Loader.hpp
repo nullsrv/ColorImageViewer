@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Image.hpp"
+#include "Common/Image.hpp"
 #include "LoaderWorker.hpp"
 
 #include <spdlog/spdlog.h>

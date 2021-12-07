@@ -20,8 +20,6 @@
 #include "MainWindow.hpp"
 #include "./ui_MainWindow.h"
 
-#include "Loader.hpp"
-
 namespace ColorImageViewer {
 
 MainWindow::MainWindow(QWidget *parent)

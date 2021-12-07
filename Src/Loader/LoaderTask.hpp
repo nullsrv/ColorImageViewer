@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "AverageColor.hpp"
-#include "Image.hpp"
+#include "Common/AverageColor.hpp"
+#include "Common/Image.hpp"
 #include "ImageLoader.hpp"
 
 #include <spdlog/spdlog.h>

@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "ImageGrid.hpp"
-#include "ImageItem.hpp"
-#include "Loader.hpp"
+#include "Widgets/ImageGrid.hpp"
+#include "Widgets/ImageItem.hpp"
+#include "Loader/Loader.hpp"
 
 #include <QMainWindow>
 

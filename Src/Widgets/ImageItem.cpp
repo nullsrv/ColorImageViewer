@@ -19,7 +19,7 @@
 
 #include "ImageItem.hpp"
 #include "ImageGrid.hpp"
-#include "Scaler.hpp"
+#include "Common/Scaler.hpp"
 
 #include <QGraphicsScene>
 
