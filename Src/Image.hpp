@@ -29,19 +29,36 @@ namespace ColorImageViewer {
 
 class Image
 {
-    int       mWidth         = 0;           // original image width
-    int       mHeight        = 0;           // original image height
-    QString   mPath          = "";          // full path
-    size_t    mSize          = 0;           // size in bytes
-    QDateTime mLastModified  = QDateTime();
-    QColor    mAverageColor  = QColor();
-    bool      mIsLoaded      = false;
-    QImage*   mImage         = nullptr;
-    QImage*   mThumbnail     = nullptr;
+    friend class ImageLoader;
+
+    // Image information.
+    int        mWidth         = 0;            // original image width
+    int        mHeight        = 0;            // original image height
+    QString    mPath          = "";           // full path
+    size_t     mSize          = 0;            // size in bytes
+    QDateTime  mLastModified  = QDateTime();
+    QColor     mAverageColor  = QColor();
+    
+    // Draw data.
+    bool       mIsLoaded      = false;
+    QByteArray mCompressed    = QByteArray(); // original image compressed in jpg
+    QImage*    mImage         = nullptr;
+    QImage*    mThumbnail     = nullptr;      // always avalible, tile of size [ImageItem x ImageItem]
+
+    Image (const QFileInfo file, const QImage* image)
+    {
+        mSize         = file.size();
+        mLastModified = file.lastModified();
+
+        mThumbnail    = new QImage(image->scaled(64, 64, Qt::AspectRatioMode::KeepAspectRatio));
+        mImage        = mThumbnail;
+        mIsLoaded     = true;
+    }
 
 public:
-    Image  (const QFileInfo file);
-    ~Image ();
+    ~Image ()
+    {
+    }
 
     auto image     () const -> QImage* { return mImage; }
     auto thumbnail () const -> QImage* { return mThumbnail; }

@@ -17,40 +17,27 @@
 // 
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "Image.hpp"
+#pragma once
+
+#include <QSize>
 
 namespace ColorImageViewer {
 
-Image::Image (QFileInfo file)
+class Scaler
 {
-    auto image = new QImage(file.filePath());
-    auto scaled = new QImage(image->scaled(256, 256, Qt::AspectRatioMode::KeepAspectRatio));
-
-    mImage = scaled;
-    if (mImage)
+public:
+    static auto scaleWithRatio (int width, int height, int maxWidth, int maxHeight) -> QSize
     {
-        mWidth        = image->width();  // save original width
-        mHeight       = image->height(); // save original height
-        mSize         = file.size();
-        mLastModified = file.lastModified();
-        mThumbnail    = new QImage(mImage->scaled(64, 64, Qt::AspectRatioMode::KeepAspectRatio));
-        mIsLoaded     = true;
-    }
+        const auto w = static_cast<double>(width);
+        const auto h = static_cast<double>(height);
 
-    delete image;
-}
-    
-Image::~Image ()
-{
-    if (mThumbnail)
-    {
-        //delete mThumbnail;
-    }
+        const auto ratio = std::min(maxWidth / w, maxHeight / h);
 
-    if (mImage)
-    {
-        //delete mImage;
+        return QSize(
+            static_cast<int>(width * ratio),
+            static_cast<int>(height * ratio)
+        );
     }
-}
+};
 
 } // namespace ColorImageViewer

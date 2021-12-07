@@ -43,8 +43,9 @@ public:
         connect(&mWorkerThread, &QThread::finished, worker, &QObject::deleteLater);
         connect(this, &Loader::startLoading, worker, &LoaderWorker::load);
         connect(worker, &LoaderWorker::imageLoaded, this, &Loader::handleImageLoaded);
-
         worker->moveToThread(&mWorkerThread);
+        
+        mWorkerThread.setObjectName("LoaderWorker");
         mWorkerThread.start();
     }
 

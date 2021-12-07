@@ -21,6 +21,7 @@
 
 #include "AverageColor.hpp"
 #include "Image.hpp"
+#include "ImageLoader.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -54,7 +55,7 @@ private:
     {
         spdlog::info("<LoaderTask:{}> loading image '{}'...", mId, mPath.fileName().toStdString());
 
-        auto image = new Image(path);
+        auto image = ImageLoader::load(path);
         auto avg   = CalculateAverageColor(image->image());
         image->averageColor(avg);
 

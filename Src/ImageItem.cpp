@@ -19,6 +19,7 @@
 
 #include "ImageItem.hpp"
 #include "ImageGrid.hpp"
+#include "Scaler.hpp"
 
 #include <QGraphicsScene>
 
@@ -29,14 +30,11 @@ ImageItem::ImageItem (Image* image)
 {
     setAcceptHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable);
-    
-    const auto w = static_cast<double>(image->width());
-    const auto h = static_cast<double>(image->height());
 
-    const auto ratio = std::min(64 / w, 64 / h);
-
-    mItemWidth  = static_cast<int>(image->width() * ratio);
-    mItemHeight = static_cast<int>(image->height() * ratio);
+    // Scale the size to fit in item box.
+    const auto scaledSize = Scaler::scaleWithRatio(image->width(), image->height(), 64, 64);
+    mItemWidth  = scaledSize.width();
+    mItemHeight = scaledSize.height();
 
     const auto halfWidth  = mItemWidth / 2;
     const auto halfHeight = mItemHeight / 2;
